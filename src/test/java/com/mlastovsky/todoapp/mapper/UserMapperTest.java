@@ -2,19 +2,18 @@ package com.mlastovsky.todoapp.mapper;
 
 import com.mlastovsky.todoapp.dto.UserRequestDto;
 import com.mlastovsky.todoapp.model.User;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ExtendWith(MockitoExtension.class)
 class UserMapperTest {
 
-    static UserMapper userMapper;
-
-    @BeforeAll
-    static void setUp() {
-        userMapper = new UserMapper();
-    }
+    @InjectMocks
+    UserMapper userMapper;
 
     @Test
     void fromUser_ShouldMapAllFieldsCorrectly (){
@@ -27,10 +26,10 @@ class UserMapperTest {
 
         var result = userMapper.fromUser(user);
 
-        assertNotNull(result);
-        assertEquals(user.getId(), result.id());
-        assertEquals(user.getUsername(), result.username());
-        assertEquals(user.getEmail(), result.email());
+        assertThat(result).isNotNull();
+        assertThat(user.getEmail()).isEqualTo(result.email());
+        assertThat(user.getUsername()).isEqualTo(result.username());
+        assertThat(user.getId()).isEqualTo(result.id());
     }
 
     @Test
@@ -43,11 +42,11 @@ class UserMapperTest {
 
         var result = userMapper.toUser(dto);
 
-        assertNotNull(result);
-        assertEquals(dto.username(), result.getUsername());
-        assertEquals(dto.email(), result.getEmail());
-        assertEquals(dto.password(), result.getPassword());
-        assertNull(result.getId());
+        assertThat(result).isNotNull();
+        assertThat(dto.username()).isEqualTo(result.getUsername());
+        assertThat(dto.email()).isEqualTo(result.getEmail());
+        assertThat(dto.password()).isEqualTo(result.getPassword());
+        assertThat(result.getId()).isNull();
     }
 
     @Test
@@ -60,10 +59,10 @@ class UserMapperTest {
 
         var result = userMapper.toUser(dto);
 
-        assertNotNull(result);
-        assertNull(result.getUsername());
-        assertEquals("partial@example.com", result.getEmail());
-        assertNull(result.getPassword());
+        assertThat(result).isNotNull();
+        assertThat(result.getUsername()).isNull();
+        assertThat("partial@example.com").isEqualTo(result.getEmail());
+        assertThat(result.getPassword()).isNull();
     }
 
 }
