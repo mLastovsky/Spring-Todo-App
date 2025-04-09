@@ -1,4 +1,4 @@
-package com.mlastovsky.todoapp.modal;
+package com.mlastovsky.todoapp.model;
 
 import jakarta.persistence.*;
 import lombok.*;
