@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: todo_app_repository
+      POSTGRES_DB: ${DB_NAME}
       PGDATA: /data/postgres
     volumes:
       - postgres_data:/data/postgres
