@@ -6,10 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record TodoUpdateRequestDto(
 
-        @NotNull(message = "id is required")
-        @NotBlank(message = "id should not be blank")
-        Long id,
-
         String description,
 
         TodoStatus status,

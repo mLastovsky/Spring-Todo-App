@@ -2,6 +2,7 @@ package com.mlastovsky.todoapp.controller;
 
 import com.mlastovsky.todoapp.dto.UserRequestDto;
 import com.mlastovsky.todoapp.dto.UserResponseDto;
+import com.mlastovsky.todoapp.dto.UserUpdateRequestDto;
 import com.mlastovsky.todoapp.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,17 +42,17 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> fullyUpdateUser(
             @PathVariable(name = "id") Long id,
-            @RequestBody @Valid UserRequestDto userRequestDto
+            @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto
     ) {
-        return ResponseEntity.ok(userService.fullyUpdateUser(id, userRequestDto));
+        return ResponseEntity.ok(userService.fullyUpdateUser(id, userUpdateRequestDto));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserResponseDto> partiallyUpdateUser(
             @PathVariable(name = "id") Long id,
-            @RequestBody @Valid UserRequestDto userRequestDto
+            @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto
     ) {
-        return ResponseEntity.ok(userService.partiallyUpdateUser(id, userRequestDto));
+        return ResponseEntity.ok(userService.partiallyUpdateUser(id, userUpdateRequestDto));
     }
 
     @DeleteMapping("/{id}")

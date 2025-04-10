@@ -2,6 +2,7 @@ package com.mlastovsky.todoapp.controller;
 
 import com.mlastovsky.todoapp.dto.TodoRequestDto;
 import com.mlastovsky.todoapp.dto.TodoResponseDto;
+import com.mlastovsky.todoapp.dto.TodoUpdateRequestDto;
 import com.mlastovsky.todoapp.service.TodoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,17 +49,17 @@ public class TodoController {
     @PutMapping("/{id}")
     public ResponseEntity<TodoResponseDto> fullyUpdateTodo(
             @PathVariable(name = "id") Long id,
-            @RequestBody @Valid TodoRequestDto todoRequestDto
+            @RequestBody @Valid TodoUpdateRequestDto todoUpdateRequestDto
     ) {
-        return ResponseEntity.ok(todoService.fullyUpdateTodo(id, todoRequestDto));
+        return ResponseEntity.ok(todoService.fullyUpdateTodo(id, todoUpdateRequestDto));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<TodoResponseDto> partiallyUpdateTodo(
             @PathVariable(name = "id") Long id,
-            @RequestBody @Valid TodoRequestDto todoRequestDto
+            @RequestBody @Valid TodoUpdateRequestDto todoUpdateRequestDto
     ) {
-        return ResponseEntity.ok(todoService.partiallyUpdateTodo(id, todoRequestDto));
+        return ResponseEntity.ok(todoService.partiallyUpdateTodo(id, todoUpdateRequestDto));
     }
 
     @DeleteMapping("/{id}")
