@@ -47,7 +47,6 @@ class TodoServiceTest {
         var userId = 1L;
         var requestDto = new TodoRequestDto(
                 "Test todo",
-                TodoStatus.IN_PROGRESS,
                 userId);
 
         var user = User.builder()
@@ -93,7 +92,6 @@ class TodoServiceTest {
 
         var todoRequestDto = new TodoRequestDto(
                 "test",
-                TodoStatus.IN_PROGRESS,
                 userId
         );
 
@@ -293,7 +291,6 @@ class TodoServiceTest {
         var userId = 1L;
         var requestDto = new TodoRequestDto(
                 "Test todo",
-                TodoStatus.IN_PROGRESS,
                 userId);
 
         var user = User.builder()
