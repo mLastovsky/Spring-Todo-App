@@ -28,7 +28,6 @@ class TodoMapperTest {
 
         var requestDto = new TodoRequestDto(
                 "Test description",
-                TodoStatus.IN_PROGRESS,
                 1L
         );
 
@@ -36,7 +35,7 @@ class TodoMapperTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getDescription()).isEqualTo(requestDto.description());
-        assertThat(result.getStatus()).isEqualTo(requestDto.status());
+        assertThat(result.getStatus()).isEqualTo(TodoStatus.IN_PROGRESS);
         assertThat(result.getOwner()).isEqualTo(owner);
         assertThat(result.getId()).isNull();
     }
