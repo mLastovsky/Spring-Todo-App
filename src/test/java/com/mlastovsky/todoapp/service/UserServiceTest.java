@@ -2,6 +2,7 @@ package com.mlastovsky.todoapp.service;
 
 import com.mlastovsky.todoapp.dto.UserRequestDto;
 import com.mlastovsky.todoapp.dto.UserResponseDto;
+import com.mlastovsky.todoapp.dto.UserUpdateRequestDto;
 import com.mlastovsky.todoapp.exception.UserAlreadyExistException;
 import com.mlastovsky.todoapp.exception.UserNotFoundException;
 import com.mlastovsky.todoapp.mapper.UserMapper;
@@ -198,7 +199,7 @@ class UserServiceTest {
     @Test
     void fullyUpdateUser_ShouldUpdateAllFields() {
         var userId = 1L;
-        var request = new UserRequestDto(
+        var request = new UserUpdateRequestDto(
                 "updated",
                 "updated@example.com",
                 "newPass"
@@ -239,7 +240,7 @@ class UserServiceTest {
     @Test
     void fullyUpdateUser_ShouldThrowExceptionWhenUserNotFound() {
         var userId = 99L;
-        var request = new UserRequestDto(
+        var request = new UserUpdateRequestDto(
                 "test",
                 "test@example.com",
                 "pass"
@@ -256,7 +257,7 @@ class UserServiceTest {
     @Test
     void partiallyUpdateUser_ShouldUpdateOnlyProvidedFields() {
         var userId = 1L;
-        var request = new UserRequestDto(
+        var request = new UserUpdateRequestDto(
                 null,
                 "updated@example.com",
                 null
@@ -292,6 +293,23 @@ class UserServiceTest {
         assertThat(updatedUser.getUsername()).isEqualTo("old");
         assertThat(updatedUser.getEmail()).isEqualTo("updated@example.com");
         assertThat(updatedUser.getPassword()).isEqualTo("oldPass");
+    }
+
+    @Test
+    void partiallyUpdateUser_ShouldThrowExceptionWhenUserNotFound() {
+        var userId = 99L;
+        var request = new UserUpdateRequestDto(
+                null,
+                "updated@example.com",
+                null
+        );
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.partiallyUpdateUser(userId, request));
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).save(any());
+        verifyNoInteractions(userMapper);
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.mlastovsky.todoapp.service;
 
 import com.mlastovsky.todoapp.dto.UserRequestDto;
 import com.mlastovsky.todoapp.dto.UserResponseDto;
+import com.mlastovsky.todoapp.dto.UserUpdateRequestDto;
 import com.mlastovsky.todoapp.exception.UserAlreadyExistException;
 import com.mlastovsky.todoapp.exception.UserNotFoundException;
 import com.mlastovsky.todoapp.mapper.UserMapper;
@@ -46,32 +47,35 @@ public class UserService {
         return userMapper.fromUser(savedUser);
     }
 
-    public UserResponseDto fullyUpdateUser(Long id, UserRequestDto request) {
+    public UserResponseDto fullyUpdateUser(Long id, UserUpdateRequestDto userUpdateRequestDto) {
         var existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(
                         format("User with ID:: %d not found", id)
                 ));
 
-        existingUser.setUsername(request.username());
-        existingUser.setEmail(request.email());
-        existingUser.setPassword(request.password());
+        existingUser.setUsername(userUpdateRequestDto.username());
+        existingUser.setEmail(userUpdateRequestDto.email());
+        existingUser.setPassword(userUpdateRequestDto.password());
 
         var updatedUser = userRepository.save(existingUser);
         return userMapper.fromUser(updatedUser);
     }
 
-    public UserResponseDto partiallyUpdateUser(Long id, UserRequestDto request) {
+    public UserResponseDto partiallyUpdateUser(Long id, UserUpdateRequestDto userUpdateRequestDto) {
         var existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(format("User with ID:: %d not found", id)));
+                .orElseThrow(() -> new UserNotFoundException(
+                                format("User with ID:: %d not found", id)
+                        )
+                );
 
-        if (request.username() != null) {
-            existingUser.setUsername(request.username());
+        if (userUpdateRequestDto.username() != null) {
+            existingUser.setUsername(userUpdateRequestDto.username());
         }
-        if (request.email() != null) {
-            existingUser.setEmail(request.email());
+        if (userUpdateRequestDto.email() != null) {
+            existingUser.setEmail(userUpdateRequestDto.email());
         }
-        if (request.password() != null) {
-            existingUser.setPassword(request.password());
+        if (userUpdateRequestDto.password() != null) {
+            existingUser.setPassword(userUpdateRequestDto.password());
         }
 
         var updatedUser = userRepository.save(existingUser);
