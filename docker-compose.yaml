@@ -20,6 +20,24 @@ services:
       - app-net
     restart: unless-stopped
 
+  todo-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: todo-app
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+    restart: unless-stopped
+
 volumes:
   postgres_data:
 
