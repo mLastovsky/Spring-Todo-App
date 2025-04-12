@@ -49,7 +49,7 @@ class GlobalExceptionHandlerTest {
         when(request.getRequestURI()).thenReturn("/api/test");
 
         // When
-        var response = handler.handleTodoNotFound(exception, request);
+        var response = handler.handleUserNotFound(exception, request);
 
         // Then
         assertThat(response)
@@ -75,7 +75,7 @@ class GlobalExceptionHandlerTest {
         when(request.getRequestURI()).thenReturn("/api/test");
 
         // When
-        var response = handler.handleTodoNotFound(exception, request);
+        var response = handler.handleUserNotFound(exception, request);
 
         // Then
         assertThat(response.getBody())

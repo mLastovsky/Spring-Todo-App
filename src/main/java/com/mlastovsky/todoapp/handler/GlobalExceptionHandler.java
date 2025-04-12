@@ -15,23 +15,26 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.lang.String.*;
+import static java.lang.String.format;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TodoNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleTodoNotFound(
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
             TodoNotFoundException ex,
             HttpServletRequest request
     ) {
+        var pathInfo = getPathInfo(request);
+        log.error("Todo not found: {} | Path: {}", ex.getMsg(), pathInfo, ex);
+
         var response = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND,
                 "Resource Not Found",
                 ex.getMsg(),
-                List.of(getPathInfo(request))
+                List.of(pathInfo)
         );
 
         return ResponseEntity
@@ -40,16 +43,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleTodoNotFound(
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
             UserNotFoundException ex,
             HttpServletRequest request
     ) {
+        var pathInfo = getPathInfo(request);
+        log.error("User not found: {} | Path: {}", ex.getMsg(), pathInfo, ex);
+
         var response = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND,
                 "Resource Not Found",
                 ex.getMsg(),
-                List.of(getPathInfo(request))
+                List.of(pathInfo)
         );
 
         return ResponseEntity
@@ -62,10 +68,17 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
+        var pathInfo = getPathInfo(request);
         var errors = ex.getBindingResult().getFieldErrors()
                 .stream()
                 .map(this::formatValidationError)
                 .toList();
+
+        log.warn("Validation failed: {} | Path: {} | Errors: {}",
+                "Request contains invalid fields",
+                pathInfo,
+                errors,
+                ex);
 
         var response = new ErrorResponse(
                 LocalDateTime.now(),
@@ -85,12 +98,18 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
+        var pathInfo = getPathInfo(request);
+        log.error("Unexpected error occurred | Path: {} | Error: {}",
+                pathInfo,
+                ex.getMessage(),
+                ex);
+
         var response = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Internal Server Error",
                 "An unexpected error occurred",
-                List.of(getPathInfo(request), ex.getMessage())
+                List.of(pathInfo, ex.getMessage())
         );
 
         return ResponseEntity
@@ -105,7 +124,7 @@ public class GlobalExceptionHandler {
     }
 
     private String getPathInfo(HttpServletRequest request) {
-        return format("Path: %s %s",
+        return format("%s %s",
                 request.getMethod(),
                 request.getRequestURI());
     }
