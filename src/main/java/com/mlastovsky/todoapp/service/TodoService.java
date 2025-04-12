@@ -55,6 +55,11 @@ public class TodoService {
     }
 
     public List<TodoResponseDto> findByUserId(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        format("User with ID:: %d not found", userId)
+                ));
+
         return todoRepository.findAllByUserId(userId).stream()
                 .map(todoMapper::fromTodo)
                 .toList();
