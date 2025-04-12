@@ -43,7 +43,7 @@ class TodoServiceTest {
     private TodoService todoService;
 
     @Test
-    void createTodo_ShouldCreateTodoWhenUserExists() {
+    void createTodo_ShouldCreateTodo_WhenUserExists() {
         var userId = 1L;
         var requestDto = new TodoRequestDto(
                 "Test todo",
@@ -87,7 +87,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void createTodo_ShouldThrowExceptionWhenUserNotExists() {
+    void createTodo_ShouldThrowException_WhenUserNotExists() {
         var userId = 99L;
 
         var todoRequestDto = new TodoRequestDto(
@@ -151,7 +151,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void findAllTodos_ShouldReturnEmptyListWhenNoTodos() {
+    void findAllTodos_ShouldReturnEmptyList_WhenNoTodos() {
         when(todoRepository.findAllTodos()).thenReturn(List.of());
 
         var result = todoService.findAllTodos();
@@ -162,7 +162,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void findById_ShouldReturnTodoWhenExists() {
+    void findById_ShouldReturnTodo_WhenExists() {
         var todoId = 1L;
         var todo = Todo.builder()
                 .id(todoId)
@@ -193,7 +193,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void findById_ShouldThrowExceptionWhenTodoNotFound() {
+    void findById_ShouldThrowException_WhenTodoNotFound() {
         var todoId = 99L;
         when(todoRepository.findById(todoId)).thenReturn(Optional.empty());
 
@@ -233,6 +233,7 @@ class TodoServiceTest {
                 LocalDateTime.now()
         );
 
+        when(userRepository.findById(userId)).thenReturn(Optional.of(User.builder().build()));
         when(todoRepository.findAllByUserId(userId)).thenReturn(List.of(todo1, todo2));
         when(todoMapper.fromTodo(todo1)).thenReturn(response1);
         when(todoMapper.fromTodo(todo2)).thenReturn(response2);
@@ -250,9 +251,10 @@ class TodoServiceTest {
     }
 
     @Test
-    void findByUserId_ShouldReturnEmptyListWhenNoTodos() {
+    void findByUserId_ShouldReturnEmptyList_WhenNoTodos() {
         var userId = 1L;
 
+        when(userRepository.findById(userId)).thenReturn(Optional.of(User.builder().build()));
         when(todoRepository.findAllByUserId(userId)).thenReturn(List.of());
 
         var result = todoService.findByUserId(userId);
@@ -263,7 +265,17 @@ class TodoServiceTest {
     }
 
     @Test
-    void deleteTodo_ShouldDeleteWhenTodoExists() {
+    void findByUserId_ShouldThrowException_WhenUserNotFound() {
+        var nonExistUserId = 99L;
+
+        when(userRepository.findById(nonExistUserId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> todoService.findByUserId(nonExistUserId));
+        verify(userRepository).findById(nonExistUserId);
+    }
+
+    @Test
+    void deleteTodo_ShouldDelete_WhenTodoExists() {
         var todoId = 1L;
 
         when(todoRepository.existsById(todoId)).thenReturn(true);
@@ -276,7 +288,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void deleteTodo_ShouldThrowExceptionWhenTodoNotFound() {
+    void deleteTodo_ShouldThrowException_WhenTodoNotFound() {
         var todoId = 999L;
 
         when(todoRepository.existsById(todoId)).thenReturn(false);
@@ -404,7 +416,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void fullyUpdateTodo_shouldThrowExceptionWhenTodoNotFound() {
+    void fullyUpdateTodo_shouldThrowException_WhenTodoNotFound() {
         var todoId = 999L;
         var userId = 1L;
 
@@ -423,7 +435,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void partiallyUpdateTodo_shouldUpdateOnlyTitleWhenProvided() {
+    void partiallyUpdateTodo_shouldUpdateOnlyTitle_WhenProvided() {
         var todoId = 1L;
         var userId = 1L;
 
@@ -478,7 +490,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void partiallyUpdateTodo_shouldUpdateOnlyStatusWhenProvided() {
+    void partiallyUpdateTodo_shouldUpdateOnlyStatus_WhenProvided() {
         var todoId = 1L;
         var userId = 1L;
         var updateDto = new TodoUpdateRequestDto(
@@ -532,7 +544,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void partiallyUpdateTodo_shouldThrowExceptionWhenTodoNotFound() {
+    void partiallyUpdateTodo_shouldThrowException_WhenTodoNotFound() {
         var todoId = 999L;
         var userId = 1L;
         var updateDto = new TodoUpdateRequestDto(
