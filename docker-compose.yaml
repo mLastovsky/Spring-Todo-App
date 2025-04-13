@@ -22,6 +22,27 @@ services:
       - app-net
     restart: unless-stopped
 
+  redis:
+    image: redis:7.0.8-alpine
+    container_name: redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USER: ${REDIS_USER}
+      REDIS_USER_PASSWORD: ${REDIS_USER_PASSWORD}
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 30s
+      timeout: 10s
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-net
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
   todo-app:
     build:
       context: ./
@@ -38,12 +59,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - app-net
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   app-net:
