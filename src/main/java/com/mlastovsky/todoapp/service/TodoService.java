@@ -6,12 +6,12 @@ import com.mlastovsky.todoapp.dto.TodoUpdateRequestDto;
 import com.mlastovsky.todoapp.exception.TodoNotFoundException;
 import com.mlastovsky.todoapp.exception.UserNotFoundException;
 import com.mlastovsky.todoapp.mapper.TodoMapper;
-import com.mlastovsky.todoapp.model.TodoStatus;
 import com.mlastovsky.todoapp.repository.TodoRepository;
 import com.mlastovsky.todoapp.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,12 +21,14 @@ import static java.lang.String.format;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "todos")
 public class TodoService {
 
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
     private final TodoMapper todoMapper;
 
+    @CachePut(key = "#result.id()")
     public TodoResponseDto createTodo(@Valid TodoRequestDto todoRequestDto) {
         var owner = userRepository.findById(todoRequestDto.ownerId())
                 .orElseThrow(() -> new UserNotFoundException(
@@ -38,22 +40,25 @@ public class TodoService {
         return todoMapper.fromTodo(todoRepository.save(todo));
     }
 
+    @Cacheable
     public List<TodoResponseDto> findAllTodos() {
         return todoRepository.findAllTodos().stream()
                 .map(todoMapper::fromTodo)
                 .toList();
     }
 
+    @Cacheable(key = "#id")
     public TodoResponseDto findById(Long id) {
         return todoRepository.findById(id)
                 .map(todoMapper::fromTodo)
                 .orElseThrow(
                         () -> new TodoNotFoundException(
-                               format("Todo with ID:: %d not found", id)
+                                format("Todo with ID:: %d not found", id)
                         )
                 );
     }
 
+    @Cacheable(cacheNames = "userTodos", key = "#userId")
     public List<TodoResponseDto> findByUserId(Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -65,6 +70,7 @@ public class TodoService {
                 .toList();
     }
 
+    @CachePut(key = "#id")
     public TodoResponseDto fullyUpdateTodo(Long id, @Valid TodoUpdateRequestDto todoRequestDto) {
         var todo = todoRepository.findById(id)
                 .orElseThrow(() -> new TodoNotFoundException(
@@ -78,6 +84,7 @@ public class TodoService {
         return todoMapper.fromTodo(updatedTodo);
     }
 
+    @CachePut(key = "#id")
     public TodoResponseDto partiallyUpdateTodo(Long id, @Valid TodoUpdateRequestDto todoRequestDto) {
         var todo = todoRepository.findById(id)
                 .orElseThrow(() -> new TodoNotFoundException(
@@ -95,8 +102,12 @@ public class TodoService {
         return todoMapper.fromTodo(updatedTodo);
     }
 
+    @Caching(evict = {
+            @CacheEvict(key = "#id"),
+            @CacheEvict(cacheNames = "userTodos", allEntries = true)
+    })
     public void deleteTodo(Long id) {
-        if(!todoRepository.existsById(id)) {
+        if (!todoRepository.existsById(id)) {
             throw new TodoNotFoundException(
                     format("Todo with ID:: %d not found", id)
             );
